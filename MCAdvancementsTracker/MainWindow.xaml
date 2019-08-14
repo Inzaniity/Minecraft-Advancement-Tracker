@@ -1,0 +1,42 @@
+﻿<Controls:MetroWindow x:Class="MCAdvancementsTracker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:local="clr-namespace:MCAdvancementsTracker"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800" Loaded="Window_Loaded">
+    <Grid>
+        <TabControl HorizontalAlignment="Left" Height="399" Margin="10,10,0,0" VerticalAlignment="Top" Width="772" TabStripPlacement="Left">
+            <TabItem Header="Overview">
+                <Grid>
+
+                </Grid>
+            </TabItem>
+            <TabItem Header="Minecraft">
+                <ContentControl x:Name="CntMinecraft" Content="ContentControl" HorizontalAlignment="Left" VerticalAlignment="Top" ScrollViewer.CanContentScroll="True"/>
+            </TabItem>
+            <TabItem Header="Nether">
+                <ContentControl x:Name="CntNether" Content="ContentControl" HorizontalAlignment="Left" VerticalAlignment="Top" ScrollViewer.CanContentScroll="True"/>
+            </TabItem>
+            <TabItem Header="The End">
+                <ContentControl x:Name="CntEnd" Content="ContentControl" HorizontalAlignment="Left" VerticalAlignment="Top" ScrollViewer.CanContentScroll="True"/>
+            </TabItem>
+            <TabItem Header="Adventure">
+                <ContentControl x:Name="CntAdventure" Content="ContentControl" HorizontalAlignment="Left" VerticalAlignment="Top" ScrollViewer.CanContentScroll="True"/>
+            </TabItem>
+            <TabItem Header="Husbandry">
+                <ContentControl x:Name="CntHusbandry" Content="ContentControl" HorizontalAlignment="Left" VerticalAlignment="Top" ScrollViewer.CanContentScroll="True"/>
+            </TabItem>
+            <TabItem Header="Config">
+                <Grid>
+                    <TextBox x:Name="tb_path" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="567" Margin="10,10,0,0" IsReadOnly="True"/>
+                    <Button x:Name="btn_path" Content="..." HorizontalAlignment="Left" VerticalAlignment="Top" Width="32" Margin="582,9,0,0" Click="Btn_path_Click"/>
+
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</Controls:MetroWindow>
