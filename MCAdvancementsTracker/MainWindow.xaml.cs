@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Path = System.Windows.Shapes.Path;
 
 namespace MCAdvancementsTracker
 {
@@ -20,9 +20,11 @@ namespace MCAdvancementsTracker
         OpenFileDialog _browserDialog = new OpenFileDialog();
         private string _path;
         private FileSystemWatcher watcher;
+        bool done;
 
         public MainWindow()
         {
+            _path = Properties.Settings.Default.Path;
             InitializeComponent();
         }
 
@@ -108,8 +110,9 @@ namespace MCAdvancementsTracker
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            _path = Environment.SpecialFolder.ApplicationData.ToString();
+
             Prep();
+
             var minecraft = new StackPanel { Orientation = System.Windows.Controls.Orientation.Vertical };
             var nether = new StackPanel { Orientation = System.Windows.Controls.Orientation.Vertical };
             var theEnd = new StackPanel { Orientation = System.Windows.Controls.Orientation.Vertical };
@@ -121,19 +124,19 @@ namespace MCAdvancementsTracker
                 switch (advancement.Category)
                 {
                     case "Minecraft":
-                        minecraft.Children.Add(new System.Windows.Controls.CheckBox { Name = advancement.Id.Replace(":", "_").Replace("/", "_"), Content = advancement.Name + " (" + advancement.Id + ")", ToolTip = advancement.Description, Padding = new Thickness(5) });
+                        minecraft.Children.Add(new System.Windows.Controls.CheckBox { Name = advancement.Id.Replace(":", "_").Replace("/", "_"), Content = advancement.Name + " (" + advancement.Id + ")", ToolTip = advancement.Description, Padding = new Thickness(5), IsEnabled = false });
                         break;
                     case "Nether":
-                        nether.Children.Add(new System.Windows.Controls.CheckBox { Name = advancement.Id.Replace(":", "_").Replace("/", "_"), Content = advancement.Name + " (" + advancement.Id + ")", ToolTip = advancement.Description, Padding = new Thickness(5) });
+                        nether.Children.Add(new System.Windows.Controls.CheckBox { Name = advancement.Id.Replace(":", "_").Replace("/", "_"), Content = advancement.Name + " (" + advancement.Id + ")", ToolTip = advancement.Description, Padding = new Thickness(5), IsEnabled = false });
                         break;
                     case "The End":
-                        theEnd.Children.Add(new System.Windows.Controls.CheckBox { Name = advancement.Id.Replace(":", "_").Replace("/", "_"), Content = advancement.Name + " (" + advancement.Id + ")", ToolTip = advancement.Description, Padding = new Thickness(5) });
+                        theEnd.Children.Add(new System.Windows.Controls.CheckBox { Name = advancement.Id.Replace(":", "_").Replace("/", "_"), Content = advancement.Name + " (" + advancement.Id + ")", ToolTip = advancement.Description, Padding = new Thickness(5), IsEnabled = false });
                         break;
                     case "Adventure":
-                        adventure.Children.Add(new System.Windows.Controls.CheckBox { Name = advancement.Id.Replace(":", "_").Replace("/", "_"), Content = advancement.Name + " (" + advancement.Id + ")", ToolTip = advancement.Description, Padding = new Thickness(5) });
+                        adventure.Children.Add(new System.Windows.Controls.CheckBox { Name = advancement.Id.Replace(":", "_").Replace("/", "_"), Content = advancement.Name + " (" + advancement.Id + ")", ToolTip = advancement.Description, Padding = new Thickness(5), IsEnabled = false });
                         break;
                     case "Husbandry":
-                        husbandry.Children.Add(new System.Windows.Controls.CheckBox { Name = advancement.Id.Replace(":", "_").Replace("/", "_"), Content = advancement.Name + " (" + advancement.Id + ")", ToolTip = advancement.Description, Padding = new Thickness(5) });
+                        husbandry.Children.Add(new System.Windows.Controls.CheckBox { Name = advancement.Id.Replace(":", "_").Replace("/", "_"), Content = advancement.Name + " (" + advancement.Id + ")", ToolTip = advancement.Description, Padding = new Thickness(5), IsEnabled = false });
                         break;
                     default:
                         break;
@@ -146,12 +149,91 @@ namespace MCAdvancementsTracker
             CntEnd.Content = theEnd;
             CntAdventure.Content = adventure;
             CntHusbandry.Content = husbandry;
+
+            if (!string.IsNullOrEmpty(_path))
+            {
+                tb_path.Text = _path;
+                StartWatcher(_path);
+                readJSON();
+            }
         }
 
         private void OnChanged(object sender, FileSystemEventArgs e)
         {
-            JObject obj = JsonConvert.DeserializeObject<JObject>(File.ReadAllText(_path));
+            watcher.EnableRaisingEvents = false;
+            Console.WriteLine("Changed");
+            readJSON();
+            watcher.EnableRaisingEvents = true;
+        }
 
+        public static bool IsFileReady(string filename)
+        {
+            // If the file can be opened for exclusive access it means that the file
+            // is no longer locked by another process.
+            try
+            {
+                using (FileStream inputStream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.None))
+                    return inputStream.Length > 0;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private void readJSON()
+        {
+            while (!IsFileReady(_path))
+            {
+
+            }
+
+            string json = File.ReadAllText(_path);
+            var obj = JObject.Parse(json);
+
+            ChildControls controls = new ChildControls();
+            List<object> controlList = controls.GetChildren(Grd_Content, 10);
+
+            foreach (var token in obj)
+            {
+                if (token.Key == "DataVersion")
+                    continue;
+                var subObj = JObject.Parse(token.Value.ToString());
+                done = (bool)subObj.GetValue("done");
+
+
+                foreach (object o in controlList)
+                {
+                    if (o.GetType() == typeof(System.Windows.Controls.CheckBox))
+                    {
+                        System.Windows.Controls.CheckBox cb = (System.Windows.Controls.CheckBox)o;
+                        cb.Dispatcher.Invoke(new Action(() =>
+                        {
+                            if (cb.Name == token.Key.Replace(":", "_").Replace("/", "_"))
+                            {
+                                cb.IsChecked = done;
+                            }
+                        }));
+
+                    }
+                }
+
+                //Console.WriteLine(token.Key + " " + token.Value);
+            }
+        }
+
+        private void StartWatcher(string path)
+        {
+            if (watcher != null)
+                watcher.Dispose();
+            watcher = new FileSystemWatcher
+            {
+                Path = System.IO.Path.GetDirectoryName(_path),
+                NotifyFilter = NotifyFilters.LastWrite,
+                Filter = "*.json",
+                EnableRaisingEvents = true
+            };
+            watcher.Changed += new FileSystemEventHandler(OnChanged);
         }
 
         private void Btn_path_Click(object sender, RoutedEventArgs e)
@@ -162,18 +244,16 @@ namespace MCAdvancementsTracker
             if (_browserDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 _path = _browserDialog.FileName;
-
-                watcher = new FileSystemWatcher
-                {
-                    Path = System.IO.Path.GetDirectoryName(_path),
-                    NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName,
-                    Filter = "*.json",
-                    EnableRaisingEvents = true
-                };
-                watcher.Changed += new FileSystemEventHandler(OnChanged);
-
                 tb_path.Text = _path;
+                Properties.Settings.Default.Path = _path;
+                Properties.Settings.Default.Save();
+                StartWatcher(_path);
             }
+        }
+
+        private void MetroWindow_Activated(object sender, EventArgs e)
+        {
+            readJSON();
         }
     }
 }

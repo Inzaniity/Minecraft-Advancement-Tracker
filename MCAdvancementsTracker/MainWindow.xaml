@@ -6,28 +6,33 @@
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:local="clr-namespace:MCAdvancementsTracker"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Loaded="Window_Loaded">
+        Title="MainWindow" Height="450" Width="800" Loaded="Window_Loaded" Activated="MetroWindow_Activated">
     <Grid>
-        <TabControl HorizontalAlignment="Left" Height="399" Margin="10,10,0,0" VerticalAlignment="Top" Width="772" TabStripPlacement="Left">
+        <TabControl x:Name="tbc" HorizontalAlignment="Left" Margin="10,10,0,10" Width="772" TabStripPlacement="Top">
             <TabItem Header="Overview">
                 <Grid>
-
+                    <ScrollViewer Margin="0,0,10,0">
+                        <Grid>
+                            <StackPanel  x:Name="Grd_Content">
+                                <Expander Header="Minecraft" HorizontalAlignment="Left" VerticalAlignment="Top" Width="722" Margin="10,10,0,0" IsExpanded="True">
+                                    <ContentControl x:Name="CntMinecraft" Content="ContentControl" HorizontalAlignment="Left" VerticalAlignment="Top" ScrollViewer.CanContentScroll="True" Grid.ColumnSpan="2"/>
+                                </Expander>
+                                <Expander Header="Nether" HorizontalAlignment="Left" VerticalAlignment="Top" Width="722" Margin="10,10,0,0" IsExpanded="True">
+                                    <ContentControl x:Name="CntNether" Content="ContentControl" HorizontalAlignment="Left" VerticalAlignment="Top" ScrollViewer.CanContentScroll="True"/>
+                                </Expander>
+                                <Expander Header="The End" HorizontalAlignment="Left" VerticalAlignment="Top" Width="722" Margin="10,10,0,0" IsExpanded="True">
+                                    <ContentControl x:Name="CntEnd" Content="ContentControl" HorizontalAlignment="Left" VerticalAlignment="Top" ScrollViewer.CanContentScroll="True"/>
+                                </Expander>
+                                <Expander Header="Adventure" HorizontalAlignment="Left" VerticalAlignment="Top" Width="722" Margin="10,10,0,0" IsExpanded="True">
+                                    <ContentControl x:Name="CntAdventure" Content="ContentControl" HorizontalAlignment="Left" VerticalAlignment="Top" ScrollViewer.CanContentScroll="True"/>
+                                </Expander>
+                                <Expander Header="Husbandry" HorizontalAlignment="Left" VerticalAlignment="Top" Width="722" Margin="10,10,0,0" IsExpanded="True">
+                                    <ContentControl x:Name="CntHusbandry" Content="ContentControl" HorizontalAlignment="Left" VerticalAlignment="Top" ScrollViewer.CanContentScroll="True"/>
+                                </Expander>
+                            </StackPanel>
+                        </Grid>
+                    </ScrollViewer>
                 </Grid>
-            </TabItem>
-            <TabItem Header="Minecraft">
-                <ContentControl x:Name="CntMinecraft" Content="ContentControl" HorizontalAlignment="Left" VerticalAlignment="Top" ScrollViewer.CanContentScroll="True"/>
-            </TabItem>
-            <TabItem Header="Nether">
-                <ContentControl x:Name="CntNether" Content="ContentControl" HorizontalAlignment="Left" VerticalAlignment="Top" ScrollViewer.CanContentScroll="True"/>
-            </TabItem>
-            <TabItem Header="The End">
-                <ContentControl x:Name="CntEnd" Content="ContentControl" HorizontalAlignment="Left" VerticalAlignment="Top" ScrollViewer.CanContentScroll="True"/>
-            </TabItem>
-            <TabItem Header="Adventure">
-                <ContentControl x:Name="CntAdventure" Content="ContentControl" HorizontalAlignment="Left" VerticalAlignment="Top" ScrollViewer.CanContentScroll="True"/>
-            </TabItem>
-            <TabItem Header="Husbandry">
-                <ContentControl x:Name="CntHusbandry" Content="ContentControl" HorizontalAlignment="Left" VerticalAlignment="Top" ScrollViewer.CanContentScroll="True"/>
             </TabItem>
             <TabItem Header="Config">
                 <Grid>
@@ -37,6 +42,7 @@
                 </Grid>
             </TabItem>
         </TabControl>
+
 
     </Grid>
 </Controls:MetroWindow>

@@ -14,8 +14,9 @@ namespace MCAdvancementsTracker
         public string Requirement { get; }
         public string Category { get; }
         public string Id { get; }
+        public bool Done { get; }
 
-        public Advancement(string name, string description, string parent, string requirement, string id, string category)
+        public Advancement(string name, string description, string parent, string requirement, string id, string category, bool done = false)
         {
             this.Name = name;
             this.Description = description;
@@ -23,7 +24,7 @@ namespace MCAdvancementsTracker
             this.Requirement = requirement;
             this.Id = id;
             this.Category = category;
-
+            this.Done = done;
         }
     }
 }
